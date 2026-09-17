@@ -27,7 +27,7 @@ cd frontend
 npm install
 npm run dev
 ```
-# What's Happening?
+## What's Happening?
 Following the responses from the start of the HTML, through the Headers, and finally to the database, we're able to understand this deployment.
 The responses from the Vue app are captured and sent through the todo.service.ts, which sends out a header for the appropriate request. This could be
 a delete, add, or completed request. Main.go initializes the connection between the database and http handlers. The HTTP handler sees the request, 
