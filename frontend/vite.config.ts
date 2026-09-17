@@ -8,4 +8,12 @@ export default defineConfig({
     vue(),
     UnoCSS(),
   ],
+  server: {
+    proxy: {
+      '/todos': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
+    },
+  },
 })

@@ -3,7 +3,9 @@ package main
 
 import (
     "database/sql"
+    "embed"
     "fmt"
+    "io/fs"
     "log"
     "net/http"
 	"os"
@@ -11,6 +13,9 @@ import (
 	"github.com/joho/godotenv"
     _ "github.com/jackc/pgx/v5/stdlib"
 )
+
+//go:embed frontend/dist
+var frontendFS embed.FS
 
 // enableCORS intercepts every request to tell the browser it is safe
 func enableCORS(next http.Handler) http.Handler {
@@ -69,8 +74,22 @@ func main() {
 	mux.HandleFunc("GET /todos/{id}", handler.Get)
     mux.HandleFunc("PATCH /todos/{id}/done", handler.Done)
 
+    distFS, err := fs.Sub(frontendFS, "frontend/dist")
+    if err != nil {
+        log.Fatalf("Failed to load frontend static files: %v", err)
+    }
+
+    fmt.Println("--- EMBEDDED FILES ---")
+    fs.WalkDir(distFS, ".", func(path string, d fs.DirEntry, err error) error {
+        fmt.Println("-", path)
+        return nil
+    })
+    fmt.Println("----------------------")
+
+    mux.Handle("/", http.FileServer(http.FS(distFS)))
+
     port := ":8080"
-    fmt.Printf("Server API running on http://localhost%s\n", port)
+    fmt.Printf("Monolith running on http://localhost%s\n", port)
     
     // 4. Wrap the router in our CORS middleware and start the server
     err = http.ListenAndServe(port, enableCORS(mux))
