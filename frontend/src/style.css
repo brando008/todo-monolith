@@ -30,6 +30,11 @@
   }
 }
 
+@keyframes terminal-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --text: #9ca3af;

@@ -8,6 +8,7 @@ const emit = defineEmits<{
 const newTodoTitle = ref('')
 const inputRef = ref<HTMLInputElement | null>(null)
 
+// Handles the input from the HTML and then verifies the input before emitting it to the higher component (App.vue)
 const handleSubmit = () => {
     if (!newTodoTitle.value.trim()) return
 
@@ -39,8 +40,7 @@ const focusInput = () => {
       <!-- 'whitespace-pre' is crucial here so spaces render correctly -->
       <span class="text-terminal-glow whitespace-pre pointer-events-none">{{ newTodoTitle }}</span>
       
-      <!-- The Blinking Terminal Cursor -->
-      <!-- This uses the custom animation you defined in uno.config.ts -->
+      <!-- Blinking Terminal Cursor -->
       <span class="text-terminal-glow font-bold ml-[2px] pointer-events-none animate-[terminal-blink_1s_steps(2,start)_infinite]">
         _
       </span>
