@@ -13,7 +13,7 @@
   
   <script setup lang="ts">
   import { ref, onMounted } from 'vue'
-  import type { Todo } from '../services/todo.service' // Adjust this path to where your Todo interface lives
+  import type { Todo } from '../services/todo.service' 
   
   const props = defineProps<{
     task: Todo
@@ -25,7 +25,6 @@
   
   onMounted(() => {
     // 1. Format the string to look like a system log
-    // Assuming your struct tag is `json:"deletedAt"` or `json:"deleted_at"`. Adjust if needed!
     const dateStr = new Date(props.task.deleted_at || '').toLocaleDateString()
     const fullText = `[SYS.DEL - ${dateStr}] ${props.task.title}`
   
