@@ -27,6 +27,16 @@ func (h *TodoHandler) GetAll(w http.ResponseWriter, r *http.Request) {
     json.NewEncoder(w).Encode(todos)
 }
 
+func (h *TodoHandler) GetHistory(w http.ResponseWriter, r *http.Request) {
+    todos, err := h.dao.GetHistory()
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+    
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(todos)
+}
 // POST /todos
 func (h *TodoHandler) Create(w http.ResponseWriter, r *http.Request) {
     var todo Todo

@@ -5,11 +5,13 @@ import { todoService, type Todo } from './services/todo.service'
 
 import TodoForm from './components/TodoForm.vue'
 import TodoItem from './components/TodoItem.vue'
+import HistoryItem from './components/HistoryItem.vue'
 
 
 const todos = ref<Todo[]>([])
 const isLoading = ref(true)
-
+const currentMode = ref<'list' | 'history'>('list')
+const historyTodos = ref<Todo[]>([])
 
 onMounted(async () => {
  try {
@@ -31,6 +33,18 @@ const handleAdd= async (title: string) => {
  }
 }
 
+const handleModeChange = async (mode: 'list' | 'history') => {
+  currentMode.value = mode
+  if (mode === 'history') {
+    try {
+      historyTodos.value = await todoService.getHistory()
+    } catch (error) {
+      console.error("Failed to fetch history: ", error)
+    } finally {
+      isLoading.value = false
+    }
+  }
+}
 
 const handleDelete = async (id:string) => {
  try {
@@ -70,20 +84,31 @@ const handleToggle = async (task: Todo) => {
       <!-- Window Body -->
       <div class="term-body flex-1 flex flex-col overflow-y-auto">
         
-        <TodoForm @add="handleAdd" />
+        <TodoForm :current-mode="currentMode" @add="handleAdd" @changeMode="handleModeChange"/>
 
         <div v-if="isLoading" class="mt-8 text-terminal-glow animate-[terminal-blink_1s_steps(2,start)_infinite]">
           Loading datastore...
         </div>
 
         <ul v-else class="space-y-2 mt-6">
-          <TodoItem
-            v-for="task in todos"
-            :key="task.id"
-            :task="task"
-            @toggle="handleToggle"
-            @delete="handleDelete"
-          />
+          <div v-if="currentMode === 'list'">
+            <TodoItem 
+              v-for="task in todos" 
+              :key="task.id" 
+              :task="task" 
+              @toggle="handleToggle" 
+              @delete="handleDelete" 
+            />
+          </div>
+
+          <div v-else-if="currentMode === 'history'">         
+            <HistoryItem 
+              v-for="(task, index) in historyTodos" 
+              :key="task.id" 
+              :task="task"
+              :index="index"
+            />
+          </div>
         </ul>
         
       </div>

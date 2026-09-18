@@ -16,8 +16,10 @@ func NewPGTodoDao(conn *sql.DB) TodoDao {
 
 func (dao *TodoDaoPGImpl) GetAll() ([]*Todo, error) {
     rows, err := dao.conn.Query(`
-        SELECT t.id, t.title, t.completed, t.created_at, t.updated_at
-        FROM todos t order by t.created_at desc
+        SELECT t.id, t.title, t.completed, t.created_at, t.updated_at, t.deleted_at
+        FROM todos t
+        WHERE t.deleted_at IS NULL 
+        ORDER BY t.created_at desc
     `)
     if err != nil {
         return nil, err
@@ -27,7 +29,7 @@ func (dao *TodoDaoPGImpl) GetAll() ([]*Todo, error) {
     todos := []*Todo{}
     for rows.Next() {
         todo := &Todo{}
-        err := rows.Scan(&todo.ID, &todo.Title, &todo.Completed, &todo.CreatedAt, &todo.UpdatedAt)
+        err := rows.Scan(&todo.ID, &todo.Title, &todo.Completed, &todo.CreatedAt, &todo.UpdatedAt, &todo.DeletedAt)
         if err != nil {
             return nil, err
         }
@@ -52,7 +54,29 @@ func (dao *TodoDaoPGImpl) Get(id string) (*Todo, error) {
 	}
 	return todo, nil
    }
-   
+
+func (dao *TodoDaoPGImpl) GetHistory() ([]*Todo, error) {
+    rows, err := dao.conn.Query(`
+        SELECT t.id, t.title, t.completed, t.created_at, t.updated_at, t.deleted_at
+        FROM todos t
+        ORDER BY t.deleted_at DESC`)
+    if err != nil {
+        return nil, err
+    }
+    defer rows.Close()
+
+    todos := []*Todo{}
+    for rows.Next() {
+        todo := &Todo{}
+        err := rows.Scan(&todo.ID, &todo.Title, &todo.Completed, &todo.CreatedAt, &todo.UpdatedAt, &todo.DeletedAt)
+        if err != nil {
+            return nil, err
+        }
+        todos = append(todos, todo)
+    }
+    return todos, nil
+}
+
 func (dao *TodoDaoPGImpl) Create(todo *Todo) error {
     _, err := dao.conn.Exec("INSERT INTO todos (id, title, completed, created_at, updated_at) VALUES ($1, $2, $3, NOW(), NOW())",
         todo.ID, todo.Title, todo.Completed)
@@ -66,7 +90,7 @@ func (dao *TodoDaoPGImpl) Update(todo *Todo) error {
 }
 
 func (dao *TodoDaoPGImpl) Delete(id string) error {
-    _, err := dao.conn.Exec("DELETE FROM todos WHERE id = $1", id)
+    _, err := dao.conn.Exec("UPDATE todos SET deleted_at = CURRENT_TIMESTAMP WHERE id = $1", id)
     return err
 }
 

@@ -7,6 +7,7 @@ export interface Todo {
     completed: boolean
     created_at?: string
     updated_at?: string
+    deleted_at?: string
   }
 
   const API_URL = '/todos';
@@ -26,6 +27,12 @@ export interface Todo {
     async get(id: string): Promise<Todo> {
       const response = await fetch(`${API_URL}/${id}`);
       if (!response.ok) throw new Error('Failed to fetch task');
+      return response.json();
+    },
+
+    async getHistory(): Promise<Todo[]> {
+      const response = await fetch(`${API_URL}/history`);
+      if (!response.ok) throw new Error('Failed to fetch history');
       return response.json();
     },
   

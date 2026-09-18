@@ -68,6 +68,7 @@ func main() {
     // 3. Set up our routes using Go's modern standard library syntax
     mux := http.NewServeMux()
     mux.HandleFunc("GET /todos", handler.GetAll)
+    mux.HandleFunc("GET /todos/history", handler.GetHistory)
     mux.HandleFunc("POST /todos", handler.Create)
     mux.HandleFunc("PUT /todos/{id}", handler.Update)
     mux.HandleFunc("DELETE /todos/{id}", handler.Delete)

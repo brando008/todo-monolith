@@ -3,6 +3,7 @@ package main
 type TodoDao interface {
 	GetAll() ([]*Todo, error)
 	Get(id string) (*Todo, error)
+	GetHistory() ([]*Todo, error)
 	Create(todo *Todo) error
 	Update(todo *Todo) error
 	Delete(id string) error

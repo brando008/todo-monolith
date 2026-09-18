@@ -3,15 +3,35 @@ import {ref} from 'vue'
 
 const emit = defineEmits<{
     (e: 'add', title:string): void
+    (e: 'changeMode', mode: 'list' | 'history'): void
+}>()
+
+const props = defineProps<{
+  currentMode: 'list' | 'history'
 }>()
 
 const newTodoTitle = ref('')
+const currentMode = ref('list')
 const inputRef = ref<HTMLInputElement | null>(null)
 
 // Handles the input from the HTML and then verifies the input before emitting it to the higher component (App.vue)
 const handleSubmit = () => {
-    if (!newTodoTitle.value.trim()) return
+  const text = newTodoTitle.value.trim()
+    if (!text) return
 
+    if (text == "/history") {
+      currentMode.value = 'history'
+      emit('changeMode', 'history')
+      newTodoTitle.value = ''
+      return
+    }
+   
+    if (newTodoTitle.value == "/todo") {
+      currentMode.value = 'list'
+      emit('changeMode', 'list')
+      newTodoTitle.value = ''
+      return
+    }
     emit('add', newTodoTitle.value)
 
     newTodoTitle.value = ''
@@ -26,7 +46,7 @@ const focusInput = () => {
 <template>
     <form @submit.prevent="handleSubmit" @click="focusInput" class="flex items-center border-b border-terminal-dim/50 pb-4 cursor-text group">
     
-    <span class="term-prompt">Todo ></span>
+    <span class="term-prompt">{{ props.currentMode === 'history' ? 'History ' : 'Todo ' }}></span>
     
     <!-- The Display Wrapper -->
     <div class="flex-1 font-mono relative flex items-center">    
