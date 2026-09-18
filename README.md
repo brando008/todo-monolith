@@ -1,6 +1,7 @@
 # Todo Monolith
 
-A full-stack todo application with a Go backend and Vue 3 frontend.
+A full-stack matrix terminal todo application.
+
 Ability to togle between Todo and History by typing "/todo" | "/history"
 
 ## What's Happening?
