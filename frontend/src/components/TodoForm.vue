@@ -32,8 +32,18 @@ const handleSubmit = () => {
       newTodoTitle.value = ''
       return
     }
-    emit('add', newTodoTitle.value)
 
+    if (text.startsWith('/')) {
+      newTodoTitle.value = ''
+      return
+    }
+
+    if (props.currentMode === 'history') {
+      newTodoTitle.value = ''
+      return
+    }
+    
+    emit('add', newTodoTitle.value)
     newTodoTitle.value = ''
 }
 
